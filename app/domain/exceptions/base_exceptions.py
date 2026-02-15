@@ -1,4 +1,4 @@
-from app.domain.core.exceptions.error_codes import (
+from app.domain.exceptions.error_codes import (
     BASE_EXCEPTION,
     RECORD_NOT_FOUND_EXCEPTION,
 )

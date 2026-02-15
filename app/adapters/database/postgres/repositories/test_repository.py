@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.ports.driven.database.postgres.test_repository_abc import TestRepositoryABC
 from app.domain.dtos.test_dto import TestDTO
 from app.adapters.database.postgres.models import Test
-from app.domain.core.exceptions.base_exceptions import RecordNotFoundException 
+from app.domain.exceptions.base_exceptions import RecordNotFoundException 
 
 class TestRepository(TestRepositoryABC):
     def __init__(self, db: Session) -> None:

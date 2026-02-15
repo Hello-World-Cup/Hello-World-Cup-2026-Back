@@ -2,7 +2,7 @@ from functools import wraps
 import inspect
 
 from app.adapters.routing.utils.response import ResponseFormatter
-from app.domain.core.exceptions.base_exceptions import DomainException
+from app.domain.exceptions.base_exceptions import DomainException
 
 
 def format_response(func):
@@ -11,7 +11,6 @@ def format_response(func):
     async def wrapper(*args, **kwargs):
         try:
             result = func(*args, **kwargs)
-
             if inspect.isawaitable(result):
                 result = await result
 

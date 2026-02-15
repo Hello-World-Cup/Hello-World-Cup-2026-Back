@@ -1,5 +1,5 @@
-from app.domain.core.config import settings
-from app.domain.core.enums import Environment
+from app.domain.config import settings
+from app.domain.enums import Environment
 
 class FeatureFlags:
     @property

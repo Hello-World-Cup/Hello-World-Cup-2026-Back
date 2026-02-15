@@ -1,6 +1,6 @@
 from pydantic_settings import BaseSettings # type: ignore
 
-from app.domain.core.enums import Environment
+from app.domain.enums import Environment
 
 class Settings(BaseSettings):
     PYTHONUNBUFFERED: int = 1

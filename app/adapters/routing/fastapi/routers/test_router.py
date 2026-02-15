@@ -1,9 +1,10 @@
-from typing import Callable
+from typing import Any
+from app.ports.driving.handler_interface import HandlerInterfaceABC
 from fastapi import APIRouter, Depends  # type: ignore
 
 from app.adapters.database.dependencies import (
-    get_test_repository_read,
-    get_test_repository_delete,
+    delete_test_by_id_handler,
+    get_test_by_id_handler,
 )
 from app.adapters.routing.utils.decorators import format_response
 from app.adapters.routing.utils.response import ResultSchema
@@ -11,16 +12,16 @@ from app.domain.dtos.test_dto import TestDTO
 
 test_router = APIRouter(tags=["test"])
 
-@test_router.get("/test")
+@test_router.get("/test", response_model=ResultSchema[TestDTO])
 @format_response
 def read_test(
-    id: int, use_case: Callable = Depends(get_test_repository_read)
-) -> ResultSchema[TestDTO]:
-    return use_case(id)
+    id: int, use_case: HandlerInterfaceABC = Depends(get_test_by_id_handler)
+) -> Any:
+    return use_case.execute(id)
 
-@test_router.post("/delete-test")
+@test_router.delete("/delete-test")
 @format_response
 def delete_test(
-    id: int, use_case: Callable = Depends(get_test_repository_delete)
-) -> ResultSchema[None]:
-    return use_case(id)
+    id: int, use_case: HandlerInterfaceABC = Depends(delete_test_by_id_handler)
+) -> Any:
+    return use_case.execute(id)

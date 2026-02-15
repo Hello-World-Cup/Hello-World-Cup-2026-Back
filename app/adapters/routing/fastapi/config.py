@@ -4,7 +4,7 @@ import sys
 from fastapi import FastAPI # type: ignore
 from fastapi.middleware.cors import CORSMiddleware # type: ignore
 
-from app.domain.core.config import settings
+from app.domain.config import settings
 
 # Routes
 from app.adapters.routing.fastapi.routers.default_router import default_router

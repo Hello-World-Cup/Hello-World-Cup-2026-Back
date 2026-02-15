@@ -22,18 +22,11 @@ services:
       target: local
     ports:
       - "8000:8000"
-      - "9023:9023"
-      - "5678:5678"
     volumes:
       - .:/app
-    environment:
-      - MONGODB_URL=mongodb://mongodb:27017/catalogs_db?replicaSet=rs0
-      - MONGODB_DB=catalogs_db
-      - DEBUG=True
-      - PYTHONPATH=/app
-      - PYTHON_DEBUGGER=True
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     env_file:
       - .env
     networks:
@@ -46,3 +39,4 @@ volumes:
 networks:
   shared_hwc_docker_network:
     driver: bridge
+    name: shared_hwc_docker_network
