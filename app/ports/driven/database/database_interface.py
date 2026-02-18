@@ -2,11 +2,11 @@ from abc import ABC, abstractmethod
 from typing import Generic, TypeVar, Optional
 from pydantic import BaseModel # type: ignore
 
-T = TypeVar("T")
-T_ID = TypeVar("T_ID")
-T_Create = TypeVar("T_Create", bound=BaseModel)
-T_Update = TypeVar("T_Update", bound=BaseModel)
-T_Read = TypeVar("T_Read", bound=BaseModel)
+T=TypeVar("T")
+T_ID=TypeVar("T_ID")
+T_Create=TypeVar("T_Create", bound=BaseModel)
+T_Update=TypeVar("T_Update", bound=BaseModel)
+T_Read=TypeVar("T_Read", bound=BaseModel)
 
 
 class UnitOfWork(ABC):

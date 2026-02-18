@@ -1,10 +1,10 @@
-from app.ports.driven.database.postgres.test_repository_abc import TestRepositoryABC
-from app.ports.driving.handler_interface import HandlerInterfaceABC
+from app.ports.driven.database.postgres.test_repository_abc import TestRepositoryInterface
+from app.ports.driving.handler_interface import HandlerInterface
 
 
-class DeleteTestByIdHandler(HandlerInterfaceABC):
-    def __init__(self, test_repository: TestRepositoryABC) -> None:
-        self._test_repository: TestRepositoryABC = test_repository
+class DeleteTestByIdHandler(HandlerInterface):
+    def __init__(self, test_repository: TestRepositoryInterface) -> None:
+        self._test_repository: TestRepositoryInterface=test_repository
 
     def execute(self, id: int) -> None:
         # Ejecuta toda la lógica de negocio asociada a la tarea

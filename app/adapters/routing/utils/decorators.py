@@ -10,9 +10,9 @@ def format_response(func):
     @wraps(func)
     async def wrapper(*args, **kwargs):
         try:
-            result = func(*args, **kwargs)
+            result=func(*args, **kwargs)
             if inspect.isawaitable(result):
-                result = await result
+                result=await result
 
             return ResponseFormatter.format_response(data=result)
         
