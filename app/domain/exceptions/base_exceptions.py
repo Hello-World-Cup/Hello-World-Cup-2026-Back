@@ -1,7 +1,9 @@
 from app.domain.exceptions.error_codes import (
     BASE_EXCEPTION,
     RECORD_NOT_FOUND_EXCEPTION,
+    DUPLICATE_RECORD_EXCEPTION,
 )
+
 
 class DomainException(Exception):
     def __init__(self, message: str, error_code: str=BASE_EXCEPTION) -> None:
@@ -18,3 +20,9 @@ class RecordNotFoundException(DomainException):
             else RECORD_NOT_FOUND_EXCEPTION
         )
         super().__init__(f"Record not found for model '{model}'", error_code)
+
+
+class DuplicateRecordException(DomainException):
+    def __init__(self, message: str, field: str = "") -> None:
+        error_code = f"{DUPLICATE_RECORD_EXCEPTION}.{field.upper()}" if field else DUPLICATE_RECORD_EXCEPTION
+        super().__init__(message, error_code)
