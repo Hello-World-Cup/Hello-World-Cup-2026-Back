@@ -1,5 +1,29 @@
+from __future__ import annotations
+
 from pydantic import BaseModel, Field  # type: ignore
 from app.domain.enums import UserStatus
+
+
+class LoginInputDTO(BaseModel):
+    """DTO para el body del request de login."""
+
+    name: str = Field(..., min_length=1)
+    email: str = Field(..., min_length=1)
+    password: str = Field(..., min_length=1)
+
+
+class LoginResponseDTO(BaseModel):
+    """DTO para la respuesta del login (token + usuario)."""
+
+    access_token: str = Field(...)
+    token_type: str = Field(default="bearer")
+    user: UserResponseDTO = Field(...)
+
+
+class SignOutResponseDTO(BaseModel):
+    """DTO para la respuesta del sign out."""
+
+    message: str = Field(default="Sesión cerrada correctamente")
 
 
 class RegisterUserInputDTO(BaseModel):

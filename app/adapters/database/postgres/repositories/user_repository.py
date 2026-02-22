@@ -1,3 +1,4 @@
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.adapters.database.postgres.models.user_model import User
@@ -10,6 +11,10 @@ from app.domain.exceptions.base_exceptions import DuplicateRecordException
 class UserRepository(UserRepositoryInterface):
     def __init__(self, db: Session) -> None:
         self.db = db
+
+    def get_by_email(self, email: str):
+        email_normalized = email.strip().lower()
+        return self.db.query(User).filter(func.lower(User.email) == email_normalized).first()
 
     def create(
         self,

@@ -10,6 +10,10 @@ class Settings(BaseSettings):
     ENVIRONMENT: Environment
     CLEAR_EXISTING_DATA_FOR_DEVELOPMENT: bool
 
+    JWT_SECRET: str="dev-secret-change-in-production"
+    JWT_ALGORITHM: str="HS256"
+    JWT_EXPIRE_MINUTES: int=60
+
     DB_POOL_PRE_PING: bool=(
         True  # Test connections before use to avoid stale connections
     )

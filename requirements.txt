@@ -7,3 +7,4 @@ fastapi-sqlalchemy==0.2.1
 sqlalchemy-utils==0.41.2
 psycopg2-binary==2.9.8
 passlib[argon2]==1.7.4
+python-jose[cryptography]==3.3.0
