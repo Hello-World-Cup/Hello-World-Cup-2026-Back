@@ -1,6 +1,7 @@
+from datetime import datetime, timezone
 from typing import Any
 from app.adapters.database.postgres.repositories.user_repository import UserRepository
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from app.ports.driving.handler_interface import HandlerInterface
 from app.domain.dtos.user_dto import (
     RegisterUserInputDTO,
@@ -61,3 +62,31 @@ def me(payload:dict=Depends(get_current_user_payload),db:Session=Depends(get_db)
         raise UnauthorizedException("Usuario no existe o sesión inválida")
     
     return UserResponseDTO.from_orm(user)
+
+@router.get("/verify", response_model=ResultSchema[dict])
+@format_response
+def verify_email(
+    token: str = Query(..., min_length=10),
+    db: Session = Depends(get_db),
+) -> Any:
+    user = UserRepository(db).get_by_verification_token(token)
+    if not user or not user.verification_expires_at:
+        raise UnauthorizedException("Invalid or expired verification token")
+
+    now = datetime.now(timezone.utc)
+    expires_at = user.verification_expires_at
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+
+    if expires_at < now:
+        raise UnauthorizedException("Invalid or expired verification token")
+
+    user.is_verified = True
+    user.verification_token = None
+    user.verification_expires_at = None
+
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+
+    return {"message": "Email verified successfully"}

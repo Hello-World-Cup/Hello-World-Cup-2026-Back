@@ -27,6 +27,9 @@ class LoginUserHandler(HandlerInterface):
         if data.name.strip().lower() != getattr(user, "name", "").strip().lower():
             raise InvalidCredentialsException()
 
+        if not getattr(user, "is_verified", False):
+            raise InvalidCredentialsException("Email not verified")
+
         access_token = self._create_access_token(user.id, user.email)
         user_response = UserResponseDTO.from_orm(user)
 

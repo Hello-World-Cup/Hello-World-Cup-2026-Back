@@ -1,5 +1,6 @@
 from sqlalchemy import func
 from sqlalchemy.orm import Session
+from datetime import datetime
 
 from app.adapters.database.postgres.models.user_model import User
 from app.ports.driven.database.postgres.user_repository_abc import UserRepositoryInterface
@@ -23,6 +24,9 @@ class UserRepository(UserRepositoryInterface):
         password_hash: str,
         portrait: str | None = None,
         status: UserStatus | None = None,
+        verification_token: str | None = None,
+        verification_expires_at: datetime | None = None,
+        is_verified: bool = False,
     ) -> UserResponseDTO:
         if self.db.query(User).filter(User.email == email).first():
             raise DuplicateRecordException(
@@ -48,8 +52,15 @@ class UserRepository(UserRepositoryInterface):
             portrait=portrait,
             category_id=None,
             status=user_status,
+
+            is_verified=is_verified,
+            verification_token=verification_token,
+            verification_expires_at=verification_expires_at,
         )
         self.db.add(user_orm)
         self.db.commit()
         self.db.refresh(user_orm)
         return UserResponseDTO.from_orm(user_orm)
+
+    def get_by_verification_token(self, token: str):
+        return self.db.query(User).filter(User.verification_token==token).first()
