@@ -6,6 +6,7 @@ from app.adapters.database.postgres.connection import SessionLocal
 from app.domain.feature_flags import FeatureFlags
 from app.adapters.database.postgres.seeders.test_seeder import TestSeeder
 from app.adapters.database.postgres.seeders.initialize_models import initialize_tables
+from app.adapters.routing.fastapi.routers.bucket_router import bucket_router
 
 app = FastAPI(title="HWC SERVER", version="1.0.0")
 init_app(app)
@@ -28,3 +29,5 @@ async def startup_events() -> None:
 @app.on_event("shutdown")
 async def shutdown_event() -> None:
     logging.getLogger("uvicorn").info("Shutting down server")
+
+app.include_router(bucket_router, prefix="/bucket")
