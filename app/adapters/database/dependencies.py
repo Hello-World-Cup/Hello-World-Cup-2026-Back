@@ -17,6 +17,7 @@ from app.domain.exceptions.base_exceptions import UnauthorizedException
 from app.adapters.database.postgres.repositories.refresh_token_repository import RefreshTokenRepository
 from app.core.use_case.auth.refresh_access_token_pro import RefreshAccessTokenProHandler
 from app.core.use_case.auth.signout_pro import SignOutProHandler
+from app.adapters.email.gmail_smtp_sender import GmailSmtpSender
 
 
 # Authorization
@@ -85,3 +86,12 @@ def get_refresh_access_token_pro_handler(db: Session = Depends(get_db)) -> Refre
 
 def get_signout_pro_handler(db: Session = Depends(get_db)) -> SignOutProHandler:
     return SignOutProHandler(get_refresh_token_repository(db))
+
+def get_email_sender() -> GmailSmtpSender:
+    return GmailSmtpSender()
+
+def get_register_user_handler(db: Session = Depends(get_db)) -> RegisterUserHandler:
+    return RegisterUserHandler(
+        get_user_repository(db),
+        get_email_sender(),
+    )

@@ -33,7 +33,7 @@ class UserRepository(UserRepositoryInterface):
                 f"Ya existe un usuario con el email '{email}'", field="EMAIL"
             )
 
-        # username derivado del email (parte antes de @)
+        # username derived from email (part before @)
         username = email.split("@")[0]
         if self.db.query(User).filter(User.username == username).first():
             raise DuplicateRecordException(

@@ -1,17 +1,18 @@
-import os
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
+from app.domain.config import settings
+from app.ports.driven.email.email_sender_interface import EmailSenderInterface
 
-class GmailSmtpSender:
+class GmailSmtpSender(EmailSenderInterface):
     def __init__(self) -> None:
-        self.host = os.getenv("SMTP_HOST", "smtp.gmail.com")
-        self.port = int(os.getenv("SMTP_PORT", "587"))
-        self.user = os.getenv("SMTP_USER")
-        self.password = os.getenv("SMTP_PASSWORD")
-        self.from_email = os.getenv("SMTP_FROM_EMAIL", self.user)
-        self.from_name = os.getenv("SMTP_FROM_NAME", "HWC")
+        self.host = settings.SMTP_HOST
+        self.port = settings.SMTP_PORT
+        self.user = settings.SMTP_USER
+        self.password = settings.SMTP_PASSWORD
+        self.from_email = settings.SMTP_FROM_EMAIL or self.user
+        self.from_name = settings.SMTP_FROM_NAME
 
         if not self.user or not self.password or not self.from_email:
             raise RuntimeError("SMTP_USER / SMTP_PASSWORD / SMTP_FROM_EMAIL are required")
