@@ -1,4 +1,3 @@
-from sqlalchemy import func
 from sqlalchemy.orm import Session
 from datetime import datetime
 
@@ -13,9 +12,9 @@ class UserRepository(UserRepositoryInterface):
     def __init__(self, db: Session) -> None:
         self.db = db
 
-    def get_by_email(self, email: str):
-        email_normalized = email.strip().lower()
-        return self.db.query(User).filter(func.lower(User.email) == email_normalized).first()
+    def get_by_email(self, email: str) -> User | None:
+        normalized_email = email.strip().lower()
+        return self.db.query(User).filter(User.email == normalized_email).first()
 
     def create(
         self,
@@ -28,13 +27,14 @@ class UserRepository(UserRepositoryInterface):
         verification_expires_at: datetime | None = None,
         is_verified: bool = False,
     ) -> UserResponseDTO:
-        if self.db.query(User).filter(User.email == email).first():
+        normalized_email = email.strip().lower()
+
+        if self.db.query(User).filter(User.email == normalized_email).first():
             raise DuplicateRecordException(
-                f"Ya existe un usuario con el email '{email}'", field="EMAIL"
+                f"Ya existe un usuario con el email '{normalized_email}'", field="EMAIL"
             )
 
-        # username derived from email (part before @)
-        username = email.split("@")[0]
+        username = normalized_email.split("@")[0]
         if self.db.query(User).filter(User.username == username).first():
             raise DuplicateRecordException(
                 f"Ya existe un usuario con el username '{username}'", field="USERNAME"
@@ -46,13 +46,12 @@ class UserRepository(UserRepositoryInterface):
         user_orm = User(
             username=username,
             name=name,
-            email=email,
+            email=normalized_email,
             password_hash=password_hash,
             role_id=DEFAULT_ROLE_ID,
             portrait=portrait,
             category_id=None,
             status=user_status,
-
             is_verified=is_verified,
             verification_token=verification_token,
             verification_expires_at=verification_expires_at,
@@ -62,8 +61,8 @@ class UserRepository(UserRepositoryInterface):
         self.db.refresh(user_orm)
         return UserResponseDTO.from_orm(user_orm)
 
-    def get_by_verification_token(self, token: str):
-        return self.db.query(User).filter(User.verification_token==token).first()
+    def get_by_verification_token(self, token: str) -> User | None:
+        return self.db.query(User).filter(User.verification_token == token).first()
 
-    def get_by_id(self, user_id: int):
+    def get_by_id(self, user_id: int) -> User | None:
         return self.db.query(User).filter(User.id == user_id).first()
