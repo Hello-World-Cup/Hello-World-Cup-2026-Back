@@ -8,16 +8,12 @@ from app.domain.enums import UserStatus
 
 
 class LoginInputDTO(BaseModel):
-    """DTO para el body del request de login."""
-
     name: str = Field(..., min_length=1)
     email: str = Field(..., min_length=1)
     password: str = Field(..., min_length=1)
 
 
 class LoginResponseDTO(BaseModel):
-    """DTO para el login y respuesta del token."""
-
     access_token: str = Field(...)
     refresh_token: str = Field(...)
     token_type: str = Field(default="bearer")
@@ -25,14 +21,10 @@ class LoginResponseDTO(BaseModel):
 
 
 class SignOutResponseDTO(BaseModel):
-    """DTO para la respuesta del sign out."""
-
     message: str = Field(default="Sesión cerrada correctamente")
 
 
 class RegisterUserInputDTO(BaseModel):
-    """DTO para el body del request de registro."""
-
     name: str = Field(..., min_length=1)
     email: str = Field(..., min_length=1)
     password: str = Field(..., min_length=1)
@@ -84,8 +76,6 @@ class UserDTO(BaseModel):
 
 
 class UserResponseDTO(BaseModel):
-    """DTO para la respuesta del registro (sin password_hash)."""
-
     id: int | None = Field(default=None)
     username: str | None = Field(default=None)
     role_id: int | None = Field(default=None)
