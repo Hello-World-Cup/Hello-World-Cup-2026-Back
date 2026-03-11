@@ -28,16 +28,28 @@ class LoginUserHandler(HandlerInterface):
         user = self._user_repository.get_by_email(data.email)
 
         if user is None:
-            raise InvalidCredentialsException()
+            raise InvalidCredentialsException(
+                message="Credenciales inválidas",
+                field="EMAIL",
+            )
 
         if not pwd_context.verify(data.password, user.password_hash):
-            raise InvalidCredentialsException()
+            raise InvalidCredentialsException(
+                message="Credenciales inválidas",
+                field="PASSWORD",
+            )
 
         if data.name.strip().lower() != getattr(user, "name", "").strip().lower():
-            raise InvalidCredentialsException()
+            raise InvalidCredentialsException(
+                message="Credenciales inválidas",
+                field="NAME",
+            )
 
         if not getattr(user, "is_verified", False):
-            raise InvalidCredentialsException("Email not verified")
+            raise InvalidCredentialsException(
+                message="Email no verificado",
+                field="EMAIL_NOT_VERIFIED",
+            )
 
         access_token = self._create_access_token(user.id, user.email)
         refresh_token = self._create_refresh_token(user.id)

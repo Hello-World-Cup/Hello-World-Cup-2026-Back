@@ -6,7 +6,7 @@ from app.ports.driving.handler_interface import HandlerInterface
 from app.ports.driven.database.postgres.refresh_token_repository_abc import RefreshTokenRepositoryInterface
 
 
-class SignOutProHandler(HandlerInterface):
+class SignOutHandler(HandlerInterface):
     def __init__(self, refresh_repo: RefreshTokenRepositoryInterface) -> None:
         self._refresh_repo = refresh_repo
 

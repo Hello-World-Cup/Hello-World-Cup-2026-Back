@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 from passlib.context import CryptContext  # type: ignore
 
 from app.domain.config import settings
-from app.domain.dtos.user_dto import RegisterUserInputDTO, UserResponseDTO
+from app.domain.dtos.user_dto import CreateUserDTO, RegisterUserInputDTO, UserResponseDTO
 from app.ports.driving.handler_interface import HandlerInterface
 from app.ports.driven.database.postgres.user_repository_abc import UserRepositoryInterface
 from app.ports.driven.email.email_sender_interface import EmailSenderInterface
@@ -28,14 +28,16 @@ class RegisterUserHandler(HandlerInterface):
         expires_at = datetime.now(timezone.utc) + timedelta(hours=24)
 
         user = self._user_repository.create(
-            name=data.name,
-            email=data.email,
-            password_hash=password_hash,
-            portrait=data.portrait,
-            status=data.status,
-            verification_token=token,
-            verification_expires_at=expires_at,
-            is_verified=False,
+            CreateUserDTO(
+                name=data.name,
+                email=data.email,
+                password_hash=password_hash,
+                portrait=data.portrait,
+                status=data.status,
+                verification_token=token,
+                verification_expires_at=expires_at,
+                is_verified=False,
+            )
         )
 
         verify_link = f"{settings.API_BASE_URL}/auth/verify?token={token}"

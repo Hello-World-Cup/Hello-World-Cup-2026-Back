@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+from datetime import datetime
+
 from pydantic import BaseModel, Field  # type: ignore
+
 from app.domain.enums import UserStatus
 
 
@@ -13,12 +16,12 @@ class LoginInputDTO(BaseModel):
 
 
 class LoginResponseDTO(BaseModel):
-    """DTO para el login y respues del token"""
+    """DTO para el login y respuesta del token."""
 
     access_token: str = Field(...)
-    refresh_token: str = Field(...)  
+    refresh_token: str = Field(...)
     token_type: str = Field(default="bearer")
-    user: UserResponseDTO = Field(...)
+    user: "UserResponseDTO" = Field(...)
 
 
 class SignOutResponseDTO(BaseModel):
@@ -37,6 +40,17 @@ class RegisterUserInputDTO(BaseModel):
     status: UserStatus | None = Field(default=None)
 
 
+class CreateUserDTO(BaseModel):
+    name: str
+    email: str
+    password_hash: str
+    portrait: str | None = None
+    status: UserStatus | None = None
+    verification_token: str | None = None
+    verification_expires_at: datetime | None = None
+    is_verified: bool = False
+
+
 class UserDTO(BaseModel):
     id: int | None = Field(default=None)
     username: str | None = Field(default=None)
@@ -47,6 +61,9 @@ class UserDTO(BaseModel):
     portrait: str | None = Field(default=None)
     status: UserStatus | None = Field(default=None)
     category_id: int | None = Field(default=None)
+    is_verified: bool | None = Field(default=None)
+    verification_token: str | None = Field(default=None)
+    verification_expires_at: datetime | None = Field(default=None)
 
     @classmethod
     def from_orm(cls, orm_obj: object) -> "UserDTO":
@@ -60,6 +77,9 @@ class UserDTO(BaseModel):
             portrait=getattr(orm_obj, "portrait", None),
             status=getattr(orm_obj, "status", None),
             category_id=getattr(orm_obj, "category_id", None),
+            is_verified=getattr(orm_obj, "is_verified", None),
+            verification_token=getattr(orm_obj, "verification_token", None),
+            verification_expires_at=getattr(orm_obj, "verification_expires_at", None),
         )
 
 
@@ -92,10 +112,12 @@ class UserResponseDTO(BaseModel):
 class RefreshTokenInputDTO(BaseModel):
     refresh_token: str = Field(..., min_length=20)
 
+
 class RefreshTokenResponseDTO(BaseModel):
     access_token: str = Field(...)
     refresh_token: str = Field(...)
     token_type: str = Field(default="bearer")
+
 
 class SignOutInputDTO(BaseModel):
     refresh_token: str = Field(..., min_length=20)

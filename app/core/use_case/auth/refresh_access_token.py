@@ -10,7 +10,7 @@ from app.ports.driven.database.postgres.refresh_token_repository_abc import Refr
 from app.ports.driven.database.postgres.user_repository_abc import UserRepositoryInterface
 
 
-class RefreshAccessTokenProHandler(HandlerInterface):
+class RefreshAccessTokenHandler(HandlerInterface):
     def __init__(self, refresh_repo: RefreshTokenRepositoryInterface, user_repo: UserRepositoryInterface) -> None:
         self._refresh_repo = refresh_repo
         self._user_repo = user_repo

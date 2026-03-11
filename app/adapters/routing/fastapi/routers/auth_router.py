@@ -1,17 +1,15 @@
-from datetime import datetime, timezone
 from typing import Any
 
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy.orm import Session
 
-from app.adapters.database.postgres.repositories.user_repository import UserRepository
 from app.adapters.database.dependencies import (
     get_register_user_handler,
     get_login_user_handler,
-    get_refresh_access_token_pro_handler,
-    get_signout_pro_handler,
+    get_refresh_access_token_handler,
+    get_signout_handler,
     get_current_user_payload,
-    get_db,
+    get_current_user_handler,
+    get_verify_email_handler,
 )
 from app.adapters.routing.utils.decorators import format_response
 from app.adapters.routing.utils.response import ResultSchema
@@ -54,7 +52,7 @@ def login(
 @format_response
 def refresh(
     data: RefreshTokenInputDTO,
-    use_case: HandlerInterface = Depends(get_refresh_access_token_pro_handler),
+    use_case: HandlerInterface = Depends(get_refresh_access_token_handler),
 ) -> Any:
     return use_case.execute(data)
 
@@ -63,7 +61,7 @@ def refresh(
 @format_response
 def signout(
     data: SignOutInputDTO,
-    use_case: HandlerInterface = Depends(get_signout_pro_handler),
+    use_case: HandlerInterface = Depends(get_signout_handler),
 ) -> Any:
     return use_case.execute(data)
 
@@ -72,43 +70,19 @@ def signout(
 @format_response
 def me(
     payload: dict = Depends(get_current_user_payload),
-    db: Session = Depends(get_db),
+    use_case: HandlerInterface = Depends(get_current_user_handler),
 ) -> Any:
     user_id = payload.get("sub")
     if not user_id:
         raise UnauthorizedException("Token inválido: falta sub")
 
-    user = UserRepository(db).get_by_id(int(user_id))  # <-- necesitas este método
-    if not user:
-        raise UnauthorizedException("Usuario no existe o sesión inválida")
-
-    return UserResponseDTO.from_orm(user)
+    return use_case.execute(int(user_id))
 
 
 @router.get("/verify", response_model=ResultSchema[dict])
 @format_response
 def verify_email(
     token: str = Query(..., min_length=10),
-    db: Session = Depends(get_db),
+    use_case: HandlerInterface = Depends(get_verify_email_handler),
 ) -> Any:
-    user = UserRepository(db).get_by_verification_token(token)
-    if not user or not user.verification_expires_at:
-        raise UnauthorizedException("Invalid or expired verification token")
-
-    now = datetime.now(timezone.utc)
-    expires_at = user.verification_expires_at
-    if expires_at.tzinfo is None:
-        expires_at = expires_at.replace(tzinfo=timezone.utc)
-
-    if expires_at < now:
-        raise UnauthorizedException("Invalid or expired verification token")
-
-    user.is_verified = True
-    user.verification_token = None
-    user.verification_expires_at = None
-
-    db.add(user)
-    db.commit()
-    db.refresh(user)
-
-    return {"message": "Email verified successfully"}
+    return use_case.execute(token)

@@ -31,8 +31,13 @@ class DuplicateRecordException(DomainException):
 
 
 class InvalidCredentialsException(DomainException):
-    def __init__(self, message: str = "Credenciales inválidas") -> None:
-        super().__init__(message, INVALID_CREDENTIALS_EXCEPTION)
+    def __init__(self, message: str = "Credenciales inválidas", field: str = "") -> None:
+        error_code = (
+            f"{INVALID_CREDENTIALS_EXCEPTION}.{field.upper()}"
+            if field
+            else INVALID_CREDENTIALS_EXCEPTION
+        )
+        super().__init__(message, error_code)
 
 
 class UnauthorizedException(DomainException):
