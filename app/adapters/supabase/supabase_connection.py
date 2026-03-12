@@ -1,15 +1,15 @@
-# app/adapters/database/storage/supabase_connection.py
-
 import os
 from supabase import create_client, Client
 from functools import lru_cache
+from app.domain.config import settings 
+
 
 
 @lru_cache()
 def supabase_client() -> Client:
 
-    url = os.getenv("SUPABASE_URL")
-    key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+    url = settings.getenv("SUPABASE_URL")
+    key = settings.getenv("SUPABASE_SERVICE_ROLE_KEY")
     
     if not url or not key:
         raise ValueError(
