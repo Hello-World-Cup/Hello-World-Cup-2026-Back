@@ -7,7 +7,7 @@ class DeleteTestByIdHandler(HandlerInterface):
         self._test_repository: TestRepositoryInterface=test_repository
 
     def execute(self, id: int) -> None:
-        # Ejecuta toda la lógica de negocio asociada a la tarea
-        # Pueden ser múltiples llamadas a repositorios, transformaciones de datos, etc
-        # Este caso de uso es el que usa el endpoint (o cualquier puerto de salida de la aplicación)
+        # Executes all business logic for the task
+        # May involve multiple repository calls, data transformations, etc.
+        # This use case is used by the endpoint (or any application output port)
         return self._test_repository.delete(id)

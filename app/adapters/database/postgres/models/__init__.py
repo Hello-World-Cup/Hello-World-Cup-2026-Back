@@ -16,4 +16,5 @@ __all__ = [
     "Sponsor",
     "Team",
     "User",
+    "RefreshToken"
 ]

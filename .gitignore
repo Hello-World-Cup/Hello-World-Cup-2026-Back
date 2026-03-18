@@ -292,3 +292,6 @@ htmlcov/
 
 # Profiling data
 .prof
+
+#documentation for myself
+docs/
