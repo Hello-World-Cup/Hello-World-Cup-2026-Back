@@ -3,12 +3,12 @@ from typing import Any
 from fastapi import APIRouter, Depends, Query # type: ignore
 
 from app.adapters.database.dependencies import (
+    RequireRoles,
     get_register_user_handler,
     get_login_user_handler,
     get_refresh_access_token_handler,
     get_signout_handler,
     get_verify_email_handler,
-    set_authorized_user,
 )
 from app.adapters.routing.utils.decorators import format_response
 from app.adapters.routing.utils.response import ResultSchema
@@ -69,7 +69,7 @@ def signout(
 
 @router.get("/me", response_model=ResultSchema[UserResponseDTO])
 @format_response
-def me(_=Depends(set_authorized_user)) -> Any:
+def me(_=Depends(RequireRoles([], []))) -> Any:
     return user_context.get()
 
 
