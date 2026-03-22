@@ -2,6 +2,9 @@ from typing import Any, Callable
 from sqlalchemy.orm import Session
 from jose import JWTError, jwt  # type: ignore
 from app.adapters.database.postgres.repositories.role_repository import RoleRepository
+from app.adapters.routing.utils.granular_permissions import GranularFunctions
+from app.domain.dtos.user_dto import UserDTO
+from app.domain.enums import UserStatus
 from app.ports.driven.database.postgres.role_repository import RoleRepositoryInterface
 from fastapi import Depends, Header  # type: ignore
 
@@ -174,9 +177,9 @@ async def set_authorized_user(
     user_context.set(repo.get_by_id(user_id))
 
 
-def RequireRoles(allowed_codes: list[str]) -> Callable[..., Any]:
+def RequireRoles(allowed_codes: list[str], granular_requirements: list[str]) -> Callable[..., Any]:
     """
-    Dependency factory that returns an authorization callable.
+    Dependency factory that returns an authorization callable later used as a dependency injection.
     """
 
     async def _authorize(
@@ -201,4 +204,15 @@ def RequireRoles(allowed_codes: list[str]) -> Callable[..., Any]:
         if role.internal_code not in allowed_codes:
             raise ForbiddenException()
 
+        granular_functions = GranularFunctions()
+
+        for requirement in granular_requirements:
+            callable = granular_functions.get_granular_function(requirement)
+
+            if callable is not None:
+                result = callable(user)
+
+                if not result:
+                    raise ForbiddenException()
+    
     return _authorize

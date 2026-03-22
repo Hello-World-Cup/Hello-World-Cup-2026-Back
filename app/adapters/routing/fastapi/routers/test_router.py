@@ -18,7 +18,7 @@ test_router=APIRouter(prefix="/tests", tags=["test"])
 def read_test(
     id: int,
     use_case: HandlerInterface = Depends(get_test_by_id_handler),
-    _=Depends(RequireRoles(["superadmin"])),
+    _=Depends(RequireRoles(["common_user"], ["check_if_user_is_active"])),
 ) -> Any:
     return use_case.execute(id)
 
