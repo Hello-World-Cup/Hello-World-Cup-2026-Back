@@ -1,17 +1,20 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+# app/adapters/database/postgres/models/team_model.py
 
+from sqlalchemy import Column, Integer, String, ForeignKey, Table  # ✅ IMPORTAR Table de SQLAlchemy
+from sqlalchemy.dialects.postgresql import ENUM as PgEnum  # ✅ Para enums en PostgreSQL
 from app.adapters.database.postgres.connection import Base
 
 
-class Team(Base):
-    __tablename__="team"
 
-    id=Column(Integer, primary_key=True)
-    name=Column(String, nullable=False)
-    logo=Column(String)
-    score=Column(Integer)
-    standing_position=Column(Integer)
-    cloud_repo_link=Column(String)
+class Team(Base):
+    __tablename__ = "team"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    logo = Column(String)
+    score = Column(Integer)
+    standing_position = Column(Integer)
+    cloud_repo_link = Column(String)
     
     edition_id = Column(
         Integer, ForeignKey("edition.id", ondelete="CASCADE"), nullable=False

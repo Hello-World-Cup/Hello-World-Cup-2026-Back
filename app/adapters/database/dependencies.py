@@ -26,6 +26,12 @@ from app.core.use_case.bucket.delete_portrait import DeletePortraitHandler
 from app.core.use_case.bucket.upload_sponsor_logo import UploadSponsorLogoHandler
 from app.core.use_case.bucket.upload_exercise import UploadExerciseHandler
 
+
+from app.adapters.database.postgres.connection import SessionLocal
+from app.adapters.database.postgres.repositories.team_repository import TeamRepository
+from app.core.use_case.team.get_user_team import GetUserTeamHandler
+from app.core.use_case.team.get_active_users import GetActiveUsersHandler
+
 from app.domain.config import settings
 from app.domain.exceptions.base_exceptions import (
     ForbiddenException,
@@ -141,13 +147,26 @@ def get_verify_email_handler(db: Session = Depends(get_db)) -> VerifyEmailHandle
     return VerifyEmailHandler(get_user_repository(db))
 
 
+def get_team_repository(db: Session = Depends(get_db)) -> TeamRepository:
+    return TeamRepository(db)
+
+def get_user_team_handler(
+    team_repo: TeamRepository = Depends(get_team_repository)
+) -> GetUserTeamHandler:
+    return GetUserTeamHandler(team_repo)
+
+def get_active_users_handler(
+    team_repo: TeamRepository = Depends(get_team_repository)
+) -> GetActiveUsersHandler:
+    return GetActiveUsersHandler(team_repo)
+
+
 # Authorization
 
 
 async def get_current_user_payload(
     authorization: str | None = Header(None, alias="Authorization"),
 ) -> dict[str, Any]:
-    """Validates the JWT from the Authorization header and returns the payload. Requires active session."""
     if not authorization or not authorization.startswith("Bearer "):
         raise UnauthorizedException("Token not sent or invalid format")
     token = authorization.removeprefix("Bearer ").strip()
@@ -178,9 +197,6 @@ async def set_authorized_user(
 
 
 def RequireRoles(allowed_codes: list[str], granular_requirements: list[str]) -> Callable[..., Any]:
-    """
-    Dependency factory that returns an authorization callable later used as a dependency injection.
-    """
 
     async def _authorize(
         db: Session = Depends(get_db),

@@ -13,6 +13,8 @@ from app.adapters.routing.fastapi.routers.test_router import test_router
 from app.adapters.routing.fastapi.routers.bucket_router import bucket_router
 
 from app.adapters.routing.fastapi.routers.auth_router import router as auth_router
+from app.adapters.routing.fastapi.routers.team_router import team_router 
+
 
 
 def init_app(app: FastAPI) -> FastAPI:
@@ -78,5 +80,7 @@ def setup_logger() -> None:
 
     logging.info("Logs are set up.")
 
+def setup_routes(app: FastAPI) -> None:
+    app.include_router(team_router) 
 
 

@@ -4,6 +4,23 @@ from app.adapters.database.postgres.connection import Base
 from app.domain.enums import UserStatus, TeamRequestStatus
 
 
+user_team_association=Table(
+    "user_team_association",
+    Base.metadata,  # type: ignore
+    Column("user_id", Integer, ForeignKey("user.id"), primary_key=True),
+    Column("team_id", Integer, ForeignKey("team.id"), primary_key=True),
+)
+
+team_request_association=Table(
+    "team_request_association",
+    Base.metadata,  # type: ignore
+    Column("id", Integer, primary_key=True),
+    Column("team_id", Integer, ForeignKey("team.id")),
+    Column("sender_user_id", Integer, ForeignKey("user.id")),
+    Column("receiver_user_id", Integer, ForeignKey("user.id")),
+    Column("status", Enum(TeamRequestStatus)),
+)
+
 class User(Base):
     __tablename__="user"
 
@@ -22,20 +39,3 @@ class User(Base):
     is_verified=Column(Boolean, default=False, nullable=False)
     verification_token=Column(String, nullable=True)
     verification_expires_at=Column(DateTime(timezone=True),nullable=True)
-
-user_team_association=Table(
-    "user_team_association",
-    Base.metadata,  # type: ignore
-    Column("user_id", Integer, ForeignKey("user.id"), primary_key=True),
-    Column("team_id", Integer, ForeignKey("team.id"), primary_key=True),
-)
-
-team_request_association=Table(
-    "team_request_association",
-    Base.metadata,  # type: ignore
-    Column("id", Integer, primary_key=True),
-    Column("team_id", Integer, ForeignKey("team.id")),
-    Column("sender_user_id", Integer, ForeignKey("user.id")),
-    Column("receiver_user_id", Integer, ForeignKey("user.id")),
-    Column("status", Enum(TeamRequestStatus)),
-)
