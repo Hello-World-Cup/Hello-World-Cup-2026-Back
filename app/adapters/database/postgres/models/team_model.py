@@ -1,7 +1,5 @@
-# app/adapters/database/postgres/models/team_model.py
-
-from sqlalchemy import Column, Integer, String, ForeignKey, Table  # ✅ IMPORTAR Table de SQLAlchemy
-from sqlalchemy.dialects.postgresql import ENUM as PgEnum  # ✅ Para enums en PostgreSQL
+from sqlalchemy import Column, Integer, String, ForeignKey, Table  
+from sqlalchemy.dialects.postgresql import ENUM as PgEnum  
 from app.adapters.database.postgres.connection import Base
 
 

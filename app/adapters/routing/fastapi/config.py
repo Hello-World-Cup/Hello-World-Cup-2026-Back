@@ -28,6 +28,8 @@ def setup_routes(app: FastAPI) -> None:
     app.include_router(test_router)
     app.include_router(bucket_router)
     app.include_router(auth_router)
+    app.include_router(team_router) 
+
 
 def setup_middleware(app: FastAPI) -> None:
     origins=["*"] # TODO: Update with specific origins in production
@@ -80,7 +82,5 @@ def setup_logger() -> None:
 
     logging.info("Logs are set up.")
 
-def setup_routes(app: FastAPI) -> None:
-    app.include_router(team_router) 
 
 
