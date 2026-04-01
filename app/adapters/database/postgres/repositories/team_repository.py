@@ -1,12 +1,10 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import desc, select
-from sqlalchemy.sql import text
 from app.ports.driving.team_interface import TeamQueryInterface
 from app.domain.dtos.team_dto import TeamResponseDTO, TeamMemberDTO, UserListDTO
 from app.domain.exceptions.base_exceptions import (
     TeamNotFoundException,
     NoCurrentEditionException,
-    NoTeamAssociationException
 )
 from app.adapters.database.postgres.models.team_model import (
     Team
@@ -92,7 +90,7 @@ class TeamRepository(TeamQueryInterface):
             .join(Role, User.role_id == Role.id)\
             .filter(
                 User.status == UserStatus.ACTIVE,
-                Role.is_super_user == False 
+                not Role.is_super_user 
             ).all()
         
         return [

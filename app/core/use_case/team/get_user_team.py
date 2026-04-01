@@ -4,7 +4,6 @@ from app.domain.dtos.team_dto import TeamResponseDTO
 from app.domain.exceptions.base_exceptions import (
     TeamNotFoundException,
 )
-from typing import Optional
 
 
 class GetUserTeamHandler(HandlerInterface):

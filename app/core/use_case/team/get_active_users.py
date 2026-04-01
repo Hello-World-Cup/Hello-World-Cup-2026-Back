@@ -1,7 +1,6 @@
 from app.ports.driving.team_interface import TeamQueryInterface
 from app.ports.driving.handler_interface import HandlerInterface
 from app.domain.dtos.team_dto import UserListDTO
-from app.domain.exceptions.base_exceptions import UserException
 from typing import List
 
 

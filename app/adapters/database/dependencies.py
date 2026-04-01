@@ -3,9 +3,6 @@ from sqlalchemy.orm import Session
 from jose import JWTError, jwt  # type: ignore
 from app.adapters.database.postgres.repositories.role_repository import RoleRepository
 from app.adapters.routing.utils.granular_permissions import GranularFunctions
-from app.domain.dtos.user_dto import UserDTO
-from app.domain.enums import UserStatus
-from app.ports.driven.database.postgres.role_repository import RoleRepositoryInterface
 from fastapi import Depends, Header  # type: ignore
 
 from app.core.use_case.test.delete_test import DeleteTestByIdHandler
@@ -27,7 +24,6 @@ from app.core.use_case.bucket.upload_sponsor_logo import UploadSponsorLogoHandle
 from app.core.use_case.bucket.upload_exercise import UploadExerciseHandler
 
 
-from app.adapters.database.postgres.connection import SessionLocal
 from app.adapters.database.postgres.repositories.team_repository import TeamRepository
 from app.core.use_case.team.get_user_team import GetUserTeamHandler
 from app.core.use_case.team.get_active_users import GetActiveUsersHandler
@@ -167,6 +163,7 @@ def get_active_users_handler(
 async def get_current_user_payload(
     authorization: str | None = Header(None, alias="Authorization"),
 ) -> dict[str, Any]:
+    """Validates the JWT from the Authorization header and returns the payload. Requires active session."""
     if not authorization or not authorization.startswith("Bearer "):
         raise UnauthorizedException("Token not sent or invalid format")
     token = authorization.removeprefix("Bearer ").strip()
@@ -197,7 +194,9 @@ async def set_authorized_user(
 
 
 def RequireRoles(allowed_codes: list[str], granular_requirements: list[str]) -> Callable[..., Any]:
-
+    """
+    Dependency factory that returns an authorization callable later used as a dependency injection.
+    """
     async def _authorize(
         db: Session = Depends(get_db),
         _=Depends(set_authorized_user),

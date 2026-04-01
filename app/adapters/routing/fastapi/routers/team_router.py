@@ -10,14 +10,7 @@ from app.adapters.database.dependencies import (
 )
 from app.adapters.routing.utils.decorators import format_response
 from app.adapters.routing.utils.context import user_context 
-from app.domain.dtos.team_dto import TeamResponseDTO
-from app.domain.dtos.user_dto import UserListDTO
-from app.domain.exceptions.base_exceptions import (
-    TeamNotFoundException,
-    NoCurrentEditionException,
-    NoTeamAssociationException,
-    UserException
-)
+
 
 team_router = APIRouter(prefix="/team", tags=["team"])
 
