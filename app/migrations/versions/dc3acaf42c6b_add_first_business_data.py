@@ -194,7 +194,7 @@ def upgrade() -> None:
         )
 
     t_id = get_id("team", "name", "UNET Cyber-Warriors")
-    u_daniel = get_id('"user"', "email", "daniel.bautista@unet.edu.ve")
+    u_daniel = get_id('"user"', "email", "daniel.bautista.test@unet.edu.ve")
 
     if t_id and u_daniel:
         if not conn.execute(
