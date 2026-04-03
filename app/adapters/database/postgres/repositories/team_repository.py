@@ -58,7 +58,7 @@ class TeamRepository(TeamQueryInterface):
         members_data = self.db.execute(stmt).all()
         
         categorized = {
-            TeamRequestStatus.DENIED: [],
+            TeamRequestStatus.DELETED: [],
             TeamRequestStatus.PENDING: [],
             TeamRequestStatus.ACCEPTED: []
         }
