@@ -21,5 +21,9 @@ class UserRepositoryInterface(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    def create_or_replace_pending(self, data: CreateUserDTO) -> UserResponseDTO:
+        raise NotImplementedError
+
+    @abstractmethod
     def confirm_email_verification(self, user_id: int) -> None:
         raise NotImplementedError

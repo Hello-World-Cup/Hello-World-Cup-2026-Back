@@ -6,7 +6,10 @@ from passlib.context import CryptContext  # type: ignore
 from app.domain.config import settings
 from app.domain.dtos.user_dto import CreateUserDTO, RegisterUserInputDTO, UserResponseDTO
 from app.domain.enums import UserStatus
-from app.domain.exceptions.base_exceptions import InvalidCredentialsException, RecordNotFoundException
+from app.domain.exceptions.base_exceptions import (
+    InvalidCredentialsException,
+    RecordNotFoundException,
+)
 from app.ports.driven.database.postgres.role_repository import RoleRepositoryInterface
 from app.ports.driving.handler_interface import HandlerInterface
 from app.ports.driven.database.postgres.user_repository_abc import UserRepositoryInterface
@@ -33,14 +36,12 @@ class RegisterUserHandler(HandlerInterface):
         token = secrets.token_urlsafe(32)
         expires_at = datetime.now(timezone.utc) + timedelta(hours=24)
 
-    
         default_role = self._role_repository.get_by_internal_code("common_user")
-        
 
         if not default_role:
             raise RecordNotFoundException("role")
 
-        user = self._user_repository.create(
+        user = self._user_repository.create_or_replace_pending(
             CreateUserDTO(
                 name=data.name,
                 email=normalized_email,
