@@ -3,7 +3,7 @@ import sys
 
 from app.adapters.routing.fastapi.middlewares.context_middleware import UserContextMiddleware
 from fastapi import FastAPI  # type: ignore
-from fastapi.middleware.cors import CORSMiddleware # type: ignore
+from fastapi.middleware.cors import CORSMiddleware  # type: ignore
 
 from app.domain.config import settings
 
@@ -13,6 +13,7 @@ from app.adapters.routing.fastapi.routers.test_router import test_router
 from app.adapters.routing.fastapi.routers.bucket_router import bucket_router
 
 from app.adapters.routing.fastapi.routers.auth_router import router as auth_router
+from app.adapters.routing.fastapi.routers.team_router import router as team_router
 
 
 def init_app(app: FastAPI) -> FastAPI:
@@ -21,15 +22,18 @@ def init_app(app: FastAPI) -> FastAPI:
     setup_logger()
     return app
 
+
 def setup_routes(app: FastAPI) -> None:
     app.include_router(default_router)
     app.include_router(test_router)
     app.include_router(bucket_router)
     app.include_router(auth_router)
+    app.include_router(team_router)
+
 
 def setup_middleware(app: FastAPI) -> None:
-    origins=["*"] # TODO: Update with specific origins in production
-    
+    origins = ["*"]  # TODO: Update with specific origins in production
+
     app.add_middleware(UserContextMiddleware)
 
     app.add_middleware(
@@ -39,33 +43,34 @@ def setup_middleware(app: FastAPI) -> None:
         allow_headers=["*"],
     )
 
+
 def setup_logger() -> None:
-    logging_levels={
+    logging_levels = {
         "DEBUG": logging.DEBUG,
         "INFO": logging.INFO,
         "WARNING": logging.WARNING,
         "ERROR": logging.ERROR,
         "CRITICAL": logging.CRITICAL,
     }
-    log_level=logging_levels.get(settings.LOGGING_LEVEL, logging.DEBUG)
+    log_level = logging_levels.get(settings.LOGGING_LEVEL, logging.DEBUG)
 
     # Get the root logger
-    logger=logging.getLogger()
+    logger = logging.getLogger()
     logger.setLevel(log_level)
 
     # Create formatter
-    formatter=logging.Formatter(
+    formatter = logging.Formatter(
         "%(asctime)s %(levelname)s %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
     )
 
     # Create handler for stdout (for INFO and below)
-    stdout_handler=logging.StreamHandler(sys.stdout)
+    stdout_handler = logging.StreamHandler(sys.stdout)
     stdout_handler.setLevel(logging.DEBUG)
     stdout_handler.setFormatter(formatter)
 
     # Create handler for stderr (for WARNING and above)
-    stderr_handler=logging.StreamHandler(sys.stderr)
+    stderr_handler = logging.StreamHandler(sys.stderr)
     stderr_handler.setLevel(logging.WARNING)
     stderr_handler.setFormatter(formatter)
 
@@ -77,6 +82,3 @@ def setup_logger() -> None:
     logging.getLogger("pymongo").setLevel(logging.WARNING)
 
     logging.info("Logs are set up.")
-
-
-

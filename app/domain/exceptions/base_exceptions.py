@@ -13,27 +13,32 @@ from app.domain.exceptions.error_codes import (
 
 
 class DomainException(Exception):
-    def __init__(self, message: str, error_code: str=BASE_EXCEPTION) -> None:
-        self.message=message
-        self.error_code=error_code
+    def __init__(self, message: str, error_code: str = BASE_EXCEPTION) -> None:
+        self.message = message
+        self.error_code = error_code
         super().__init__(self.message)
+
 
 class RecordNotFoundException(DomainException):
     def __init__(self, model: str) -> None:
-        self.model=model
-        error_code=(
+        self.model = model
+        error_code = (
             f"{RECORD_NOT_FOUND_EXCEPTION}.{model.upper()}"
             if model
             else RECORD_NOT_FOUND_EXCEPTION
         )
         super().__init__(f"Record not found for model '{model}'", error_code)
 
+
 class BucketException(Exception):
     pass
 
+
 class InvalidFileTypeError(BucketException):
     def __init__(self, expected: str, received: str, field: str = "file"):
-        message = f"Invalid file type for {field}. Expected: {expected}, received: {received}"
+        message = (
+            f"Invalid file type for {field}. Expected: {expected}, received: {received}"
+        )
         super().__init__(message, INVALID_FILE_TYPE)
         self.expected = expected
         self.received = received
@@ -59,9 +64,14 @@ class BucketNotFoundError(BucketException):
         super().__init__(message, BUCKET_NOT_FOUND)
         self.bucket = bucket
 
+
 class DuplicateRecordException(DomainException):
     def __init__(self, message: str, field: str = "") -> None:
-        error_code = f"{DUPLICATE_RECORD_EXCEPTION}.{field.upper()}" if field else DUPLICATE_RECORD_EXCEPTION
+        error_code = (
+            f"{DUPLICATE_RECORD_EXCEPTION}.{field.upper()}"
+            if field
+            else DUPLICATE_RECORD_EXCEPTION
+        )
         super().__init__(message, error_code)
 
 class InvalidCredentialsException(DomainException):
@@ -77,6 +87,9 @@ class UnauthorizedException(DomainException):
     def __init__(self, message: str = "Invalid or expired session") -> None:
         super().__init__(message, UNAUTHORIZED_EXCEPTION)
 
+
 class ForbiddenException(DomainException):
-    def __init__(self, message: str = "Access denied") -> None:
+    def __init__(
+        self, message: str = "You are not allowed to perform this action"
+    ) -> None:
         super().__init__(message, FORBIDDEN_EXCEPTION)
