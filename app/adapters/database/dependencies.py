@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from jose import JWTError, jwt  # type: ignore
 from app.adapters.database.postgres.repositories.role_repository import RoleRepository
 from app.adapters.routing.utils.granular_permissions import GranularFunctions
+from app.domain.dtos.user_dto import UserDTO
 from fastapi import Depends, Header  # type: ignore
 
 from app.core.use_case.test.delete_test import DeleteTestByIdHandler
@@ -13,6 +14,7 @@ from app.core.use_case.auth.get_current_user import GetCurrentUserHandler
 from app.core.use_case.auth.verify_email import VerifyEmailHandler
 from app.adapters.database.postgres.repositories.test_repository import TestRepository
 from app.adapters.database.postgres.repositories.user_repository import UserRepository
+from app.adapters.database.postgres.repositories.team_repository import TeamRepository
 from app.adapters.database.postgres.connection import get_db
 from app.adapters.supabase.supabase_connection import supabase_client
 from app.adapters.supabase.supabase_storage import StorageBucketSupabase
@@ -41,6 +43,16 @@ from app.adapters.database.postgres.repositories.refresh_token_repository import
 from app.core.use_case.auth.refresh_access_token import RefreshAccessTokenHandler
 from app.core.use_case.auth.signout import SignOutHandler
 from app.adapters.email.gmail_smtp_sender import GmailSmtpSender
+from app.core.use_case.team.create_team import CreateTeamHandler
+from app.core.use_case.team.send_team_invitations import SendTeamInvitationsHandler
+from app.core.use_case.team.delete_team_invitation import DeleteTeamInvitationHandler
+from app.core.use_case.team.delete_team import DeleteTeamHandler
+from app.core.use_case.team.list_my_team_invitations import (
+    ListMyTeamInvitationsHandler,
+)
+from app.core.use_case.team.accept_team_invitation import AcceptTeamInvitationHandler
+from app.core.use_case.team.list_teams import ListTeamsHandler
+from app.core.use_case.team.get_team_detail import GetTeamDetailHandler
 
 from app.adapters.routing.utils.context import user_context
 
@@ -181,56 +193,105 @@ async def get_current_user_payload(
 
 
 async def set_authorized_user(
-    user_payload=Depends(get_current_user_payload),
+    user_payload: dict = Depends(get_current_user_payload),
     db: Session = Depends(get_db),
 ) -> None:
     user_id = user_payload.get("sub")
-
     if not user_id:
         raise UnauthorizedException("Invalid token")
 
-    repo = get_user_repository(db)
-    user_context.set(repo.get_by_id(user_id))
+    user_response = get_user_repository(db).get_by_id(int(user_id))
+    if not user_response:
+        raise UnauthorizedException("User not found")
+
+    # `user_context` is typed as `UserDTO`, but `get_by_id` returns `UserResponseDTO`.
+    user_context.set(UserDTO(**user_response.model_dump()))
 
 
-def RequireRoles(allowed_codes: list[str], granular_requirements: list[str]) -> Callable[..., Any]:
+def RequireRoles(
+    allowed_codes: list[str],
+    granular_requirements: list[str],
+) -> Callable[..., Any]:
     """
-    Dependency factory that returns an authorization callable later used as a dependency injection.
+    Dependency factory for role-based and granular authorization.
     """
     async def _authorize(
         db: Session = Depends(get_db),
         _=Depends(set_authorized_user),
     ) -> None:
-
-        role_repo = get_role_repository(db)
-
-        if not allowed_codes and not granular_requirements:
-            return
-
+        # set_authorized_user guarantees authentication and populates `user_context`.
         user = user_context.get()
         if not user or not user.role_id:
             raise UnauthorizedException("Authentication required")
 
+        # Authentication-only dependency.
+        if not allowed_codes and not granular_requirements:
+            return
+
+        role_repo = get_role_repository(db)
         role = role_repo.get_by_id(user.role_id)
 
         if not role:
             raise UnauthorizedException("User role not found or invalid")
-        
+
+        # Super admin bypasses any role/granular restrictions.
         if role.is_super_user:
             return
 
-        if role.internal_code not in allowed_codes:
+        if allowed_codes and role.internal_code not in allowed_codes:
             raise ForbiddenException()
 
-        granular_functions = GranularFunctions()
-
-        for requirement in granular_requirements:
-            callable = granular_functions.get_granular_function(requirement)
-
-            if callable is not None:
-                result = callable(user)
-
-                if not result:
+        if granular_requirements:
+            granular_functions = GranularFunctions()
+            for requirement in granular_requirements:
+                granular_callable = granular_functions.get_granular_function(
+                    requirement
+                )
+                if granular_callable is None or not granular_callable(user):
                     raise ForbiddenException()
-    
+
     return _authorize
+
+
+def get_team_repository(db: Session) -> TeamRepository:
+    return TeamRepository(db)
+
+
+def get_create_team_handler(db: Session = Depends(get_db)) -> CreateTeamHandler:
+    return CreateTeamHandler(get_team_repository(db))
+
+
+def get_list_teams_handler(db: Session = Depends(get_db)) -> ListTeamsHandler:
+    return ListTeamsHandler(get_team_repository(db))
+
+
+def get_team_detail_handler(db: Session = Depends(get_db)) -> GetTeamDetailHandler:
+    return GetTeamDetailHandler(get_team_repository(db))
+
+
+def get_send_team_invitations_handler(
+    db: Session = Depends(get_db),
+) -> SendTeamInvitationsHandler:
+    return SendTeamInvitationsHandler(get_team_repository(db))
+
+
+def get_list_my_team_invitations_handler(
+    db: Session = Depends(get_db),
+) -> ListMyTeamInvitationsHandler:
+    return ListMyTeamInvitationsHandler(get_team_repository(db))
+
+
+def get_delete_team_invitation_handler(
+    db: Session = Depends(get_db),
+) -> DeleteTeamInvitationHandler:
+    return DeleteTeamInvitationHandler(get_team_repository(db))
+
+
+def get_accept_team_invitation_handler(
+    db: Session = Depends(get_db),
+) -> AcceptTeamInvitationHandler:
+    return AcceptTeamInvitationHandler(get_team_repository(db))
+
+
+def get_delete_team_handler(db: Session = Depends(get_db)) -> DeleteTeamHandler:
+    return DeleteTeamHandler(get_team_repository(db))
