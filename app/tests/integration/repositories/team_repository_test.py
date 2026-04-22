@@ -41,12 +41,18 @@ def test_get_user_team_not_found_real_user(repo, db_session) -> None:
 def test_get_user_team_info_is_correct(repo, db_session):
     user = db_session.query(User).filter_by(email="daniel.bautista.test@unet.edu.ve").first()
     assert user is not None, "The migration did not load the user Daniel"
+    team = db_session.query(Team).filter_by(name="UNET Cyber-Warriors").first()
+    assert team is not None, "The migration did not load the expected team"
 
     response = repo.get_user_team(str(user.id))
 
     assert isinstance(response, GetUserTeamResponseDTO)
     assert response.team_name == "UNET Cyber-Warriors"
     assert response.edition_name == "First Edition 2026"
+    assert response.status == team.status
+    assert response.feedback == team.feedback
+    assert response.assigned_evaluator_id == team.assigned_evaluator_id
+    assert response.project_evaluator_id == team.project_evaluator_id
 
     assert len(response.accepted_members) > 0
     member = response.accepted_members[0]

@@ -1,10 +1,11 @@
 from datetime import datetime
 
-from sqlalchemy import delete, func, select, update
+from sqlalchemy import delete, desc, func, select, update
 from sqlalchemy.orm import Session, aliased
 
 from app.adapters.database.postgres.models.category_model import Category
 from app.adapters.database.postgres.models.edition_model import Edition
+from app.adapters.database.postgres.models.role_model import Role
 from app.adapters.database.postgres.models.team_model import Team
 from app.adapters.database.postgres.models.user_model import (
     User,
@@ -16,28 +17,25 @@ from app.domain.dtos.team_dto import (
     TeamDetailDTO,
     TeamInvitationSummaryDTO,
     TeamListItemDTO,
+    TeamMemberDTO,
     TeamRequestDTO,
     TeamResponseDTO,
+    UserListDTO,
 )
 from app.domain.dtos.user_dto import UserDTO, UserResponseDTO
-from app.domain.enums import TeamRequestStatus
-from app.domain.exceptions.base_exceptions import RecordNotFoundException
+from app.domain.enums import TeamRequestStatus, UserStatus
+from app.domain.exceptions.base_exceptions import (
+    NoCurrentEditionException,
+    RecordNotFoundException,
+    TeamNotFoundException,
+)
 from app.ports.driven.database.postgres.team_repository_abc import (
     TeamRepositoryInterface,
 )
-
-from sqlalchemy import desc, select
-from app.adapters.database.postgres.models.role_model import Role
-from app.domain.enums import TeamRequestStatus, UserStatus
-from app.domain.dtos.team_dto import TeamMemberDTO, TeamResponseDTO, UserListDTO
-from app.domain.exceptions.base_exceptions import (
-    NoCurrentEditionException,
-    TeamNotFoundException,
-)
-from typing import List
+from app.ports.driving.team_interface import TeamQueryInterface
 
 
-class TeamRepository(TeamRepositoryInterface):
+class TeamRepository(TeamRepositoryInterface, TeamQueryInterface):
     def __init__(self, db: Session) -> None:
         self.db = db
 
@@ -211,14 +209,18 @@ class TeamRepository(TeamRepositoryInterface):
             team_name=team.name,
             edition_id=str(current_edition.id),
             edition_name=current_edition.name,
-            created_at=getattr(team, 'created_at', None),
-            updated_at=getattr(team, 'updated_at', None),
+            status=getattr(team, "status", 0),
+            feedback=getattr(team, "feedback", None),
+            assigned_evaluator_id=getattr(team, "assigned_evaluator_id", None),
+            project_evaluator_id=getattr(team, "project_evaluator_id", None),
+            created_at=getattr(team, "created_at", None),
+            updated_at=getattr(team, "updated_at", None),
             deleted_members=categorized[TeamRequestStatus.DELETED],
             pending_members=categorized[TeamRequestStatus.PENDING],
-            accepted_members=categorized[TeamRequestStatus.ACCEPTED]
+            accepted_members=categorized[TeamRequestStatus.ACCEPTED],
         )
     
-    def get_active_users(self) -> List[UserListDTO]:
+    def get_active_users(self) -> list[UserListDTO]:
         users = self.db.query(User)\
             .join(Role, User.role_id == Role.id)\
             .filter(
@@ -281,10 +283,13 @@ class TeamRepository(TeamRepositoryInterface):
             score=None,
             standing_position=None,
             cloud_repo_link=None,
+            status=0,
+            feedback=None,
             edition_id=edition_id,
             category_id=category_id,
             evaluation_id=None,
             assigned_evaluator_id=leader_id,
+            project_evaluator_id=None,
         )
 
         try:

@@ -1,13 +1,11 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, Field  # type: ignore
-
-from app.domain.enums import TeamRequestStatus
-from app.domain.dtos.user_dto import UserResponseDTO
-
 from datetime import datetime
-from typing import Optional
+
 from pydantic import BaseModel, Field  # type: ignore
+
+from app.domain.dtos.user_dto import UserResponseDTO
+from app.domain.enums import TeamRequestStatus
 
 
 class TeamResponseDTO(BaseModel):
@@ -17,10 +15,13 @@ class TeamResponseDTO(BaseModel):
     score: int | None = Field(default=None)
     standing_position: int | None = Field(default=None)
     cloud_repo_link: str | None = Field(default=None)
+    status: int = Field(default=0)
+    feedback: str | None = Field(default=None)
     edition_id: int = Field(...)
     category_id: int = Field(...)
     evaluation_id: int | None = Field(default=None)
     assigned_evaluator_id: int | None = Field(default=None)
+    project_evaluator_id: int | None = Field(default=None)
 
     @classmethod
     def from_orm(cls, orm_obj: object) -> "TeamResponseDTO":
@@ -31,10 +32,13 @@ class TeamResponseDTO(BaseModel):
             score=getattr(orm_obj, "score", None),
             standing_position=getattr(orm_obj, "standing_position", None),
             cloud_repo_link=getattr(orm_obj, "cloud_repo_link", None),
+            status=getattr(orm_obj, "status", 0),
+            feedback=getattr(orm_obj, "feedback", None),
             edition_id=getattr(orm_obj, "edition_id"),
             category_id=getattr(orm_obj, "category_id"),
             evaluation_id=getattr(orm_obj, "evaluation_id", None),
             assigned_evaluator_id=getattr(orm_obj, "assigned_evaluator_id", None),
+            project_evaluator_id=getattr(orm_obj, "project_evaluator_id", None),
         )
 
 
@@ -147,6 +151,10 @@ class GetUserTeamResponseDTO(BaseModel):
     team_name: str
     edition_id: str
     edition_name: str
+    status: int = Field(default=0)
+    feedback: str | None = Field(default=None)
+    assigned_evaluator_id: int | None = Field(default=None)
+    project_evaluator_id: int | None = Field(default=None)
     created_at: datetime | None = Field(default=None)
     updated_at: datetime | None = Field(default=None)
     deleted_members: list[TeamMemberDTO] = Field(default_factory=list)

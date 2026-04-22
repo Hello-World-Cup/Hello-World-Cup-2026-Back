@@ -2,11 +2,13 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 
 from app.domain.dtos.team_dto import (
+    GetUserTeamResponseDTO,
     TeamDetailDTO,
     TeamInvitationSummaryDTO,
     TeamListItemDTO,
     TeamRequestDTO,
     TeamResponseDTO,
+    UserListDTO,
 )
 from app.domain.dtos.user_dto import UserDTO
 from app.domain.enums import TeamRequestStatus
@@ -31,6 +33,14 @@ class TeamRepositoryInterface(ABC):
 
     @abstractmethod
     def user_has_team(self, user_id: int) -> bool:
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_user_team(self, user_id: str) -> GetUserTeamResponseDTO:
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_active_users(self) -> list[UserListDTO]:
         raise NotImplementedError
 
     @abstractmethod
