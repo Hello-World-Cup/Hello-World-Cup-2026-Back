@@ -27,7 +27,7 @@ from app.ports.driving.handler_interface import HandlerInterface
 from app.adapters.routing.utils.context import user_context
 
 
-router = APIRouter(prefix="/auth", tags=["auth"])
+router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
 @router.post("/register", status_code=201, response_model=ResultSchema[UserResponseDTO])

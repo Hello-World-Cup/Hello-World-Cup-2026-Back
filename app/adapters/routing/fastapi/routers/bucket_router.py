@@ -19,7 +19,7 @@ from app.adapters.database.dependencies import (
 from app.adapters.routing.utils.decorators import format_response
 from typing import Any  
 
-bucket_router = APIRouter(prefix="/bucket", tags=["bucket"])
+bucket_router = APIRouter(prefix="/bucket", tags=["Files"])
 
 
 @bucket_router.post("/portrait")

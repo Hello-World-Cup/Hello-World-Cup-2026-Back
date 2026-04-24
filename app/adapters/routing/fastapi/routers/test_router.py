@@ -11,7 +11,7 @@ from app.adapters.routing.utils.decorators import format_response
 from app.adapters.routing.utils.response import ResultSchema
 from app.domain.dtos.test_dto import TestDTO
 
-test_router=APIRouter(prefix="/tests", tags=["test"])
+test_router=APIRouter(prefix="/tests", tags=["Tests"])
 
 @test_router.get("/test", response_model=ResultSchema[TestDTO])
 @format_response

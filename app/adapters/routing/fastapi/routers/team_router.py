@@ -38,7 +38,7 @@ from app.domain.exceptions.base_exceptions import UnauthorizedException
 from app.ports.driving.handler_interface import HandlerInterface
 from app.adapters.routing.utils.context import user_context
 
-router = APIRouter(prefix="/teams", tags=["teams"])
+router = APIRouter(prefix="/teams", tags=["Teams"])
 
 
 def _get_current_user_id() -> int:
@@ -52,7 +52,7 @@ def _get_current_user_id() -> int:
 @format_response
 def create_team(
     data: CreateTeamInputDTO,
-    _=Depends(RequireRoles([], [])),
+    _=Depends(RequireRoles(["common_user", "admin"], [])),
     use_case: HandlerInterface = Depends(get_create_team_handler),
 ) -> Any:
     return use_case.execute(_get_current_user_id(), data)
@@ -61,7 +61,7 @@ def create_team(
 @router.get("", response_model=ResultSchema[ListTeamsResponseDTO])
 @format_response
 def list_teams(
-    _=Depends(RequireRoles([], [])),
+    _=Depends(RequireRoles(["admin"], [])),
     use_case: HandlerInterface = Depends(get_list_teams_handler),
 ) -> Any:
     return use_case.execute()
@@ -71,7 +71,7 @@ def list_teams(
 @format_response
 async def get_user_team(
     handler: GetUserTeamHandler = Depends(get_user_team_handler),
-    _: str = Depends(RequireRoles([], [])),  
+    _: str = Depends(RequireRoles(["common_user", "admin"], [])),  
 ) -> Any:
     current_user = user_context.get()
     if not current_user or not hasattr(current_user, 'id'):
@@ -84,7 +84,7 @@ async def get_user_team(
 @format_response
 async def get_active_users(
     handler: GetActiveUsersHandler = Depends(get_active_users_handler),
-    _: str = Depends(RequireRoles([], [])),  
+    _: str = Depends(RequireRoles(["common_user", "admin"], [])),  
 ) -> Any:
     return handler.execute()
 
@@ -93,7 +93,7 @@ async def get_active_users(
 @format_response
 def get_team_detail(
     team_id: int,
-    _=Depends(RequireRoles([], [])),
+    _=Depends(RequireRoles(["common_user", "admin"], [])),
     use_case: HandlerInterface = Depends(get_team_detail_handler),
 ) -> Any:
     return use_case.execute(team_id)
@@ -106,7 +106,7 @@ def get_team_detail(
 @format_response
 def send_team_invitations(
     data: SendTeamInvitationsInputDTO,
-    _=Depends(RequireRoles([], [])),
+    _=Depends(RequireRoles(["common_user", "admin"], [])),
     use_case: HandlerInterface = Depends(get_send_team_invitations_handler),
 ) -> Any:
     return use_case.execute(_get_current_user_id(), data)
@@ -118,7 +118,7 @@ def send_team_invitations(
 )
 @format_response
 def list_my_team_invitations(
-    _=Depends(RequireRoles([], [])),
+    _=Depends(RequireRoles(["common_user", "admin"], [])),
     use_case: HandlerInterface = Depends(get_list_my_team_invitations_handler),
 ) -> Any:
     return use_case.execute(_get_current_user_id())
@@ -131,7 +131,7 @@ def list_my_team_invitations(
 @format_response
 def accept_team_invitation(
     team_request_id: int,
-    _=Depends(RequireRoles([], [])),
+    _=Depends(RequireRoles(["common_user", "admin"], [])),
     use_case: HandlerInterface = Depends(get_accept_team_invitation_handler),
 ) -> Any:
     return use_case.execute(_get_current_user_id(), team_request_id)

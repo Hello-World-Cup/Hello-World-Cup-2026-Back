@@ -252,11 +252,6 @@ def RequireRoles(
 
     return _authorize
 
-
-def get_team_repository(db: Session) -> TeamRepository:
-    return TeamRepository(db)
-
-
 def get_create_team_handler(db: Session = Depends(get_db)) -> CreateTeamHandler:
     return CreateTeamHandler(get_team_repository(db))
 
