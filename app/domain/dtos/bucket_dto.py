@@ -29,8 +29,14 @@ class UploadExerciseDTO(BaseModel):
 class DeletePortraitDTO(BaseModel):
     user_id: str = Field(..., description="ID del usuario")
 
-class DeleteSponsorLogoDTO(BaseModel):
+class GetPortraitDTO(BaseModel):
+    user_id: str = Field(..., description="ID del usuario")
+
+class GetSponsorLogoDTO(BaseModel):
     sponsor_id: str = Field(..., description="ID del sponsor")
+
+class GetExerciseDTO(BaseModel):
+    exercise_id: str = Field(..., description="ID del ejercicio")
 
 class DeleteExerciseDTO(BaseModel):
     exercise_id: str = Field(..., description="ID del ejercicio")

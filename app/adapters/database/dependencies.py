@@ -24,9 +24,11 @@ from app.core.use_case.bucket.upload_portrait import UploadPortraitHandler
 from app.core.use_case.bucket.delete_portrait import DeletePortraitHandler
 from app.core.use_case.bucket.upload_sponsor_logo import UploadSponsorLogoHandler
 from app.core.use_case.bucket.upload_exercise import UploadExerciseHandler
+from app.core.use_case.bucket.get_portrait import GetPortraitHandler
+from app.core.use_case.bucket.get_sponsor_logo import GetSponsorLogoHandler
+from app.core.use_case.bucket.get_exercise import GetExerciseHandler
 
 
-from app.adapters.database.postgres.repositories.team_repository import TeamRepository
 from app.core.use_case.team.get_user_team import GetUserTeamHandler
 from app.core.use_case.team.get_active_users import GetActiveUsersHandler
 
@@ -99,6 +101,24 @@ def get_delete_portrait_handler(
     return DeletePortraitHandler(storage)
 
 
+def get_get_portrait_handler(
+    storage: StorageBucketInterfaceABC = Depends(get_supabase_client),
+) -> GetPortraitHandler:
+    return GetPortraitHandler(storage)
+
+
+def get_get_sponsor_logo_handler(
+    storage: StorageBucketInterfaceABC = Depends(get_supabase_client),
+) -> GetSponsorLogoHandler:
+    return GetSponsorLogoHandler(storage)
+
+
+def get_get_exercise_handler(
+    storage: StorageBucketInterfaceABC = Depends(get_supabase_client),
+) -> GetExerciseHandler:
+    return GetExerciseHandler(storage)
+
+
 def get_upload_sponsor_logo_handler(
     storage: StorageBucketInterfaceABC = Depends(get_supabase_client),
 ) -> UploadSponsorLogoHandler:
@@ -158,13 +178,15 @@ def get_verify_email_handler(db: Session = Depends(get_db)) -> VerifyEmailHandle
 def get_team_repository(db: Session = Depends(get_db)) -> TeamRepository:
     return TeamRepository(db)
 
+
 def get_user_team_handler(
-    team_repo: TeamRepository = Depends(get_team_repository)
+    team_repo: TeamRepository = Depends(get_team_repository),
 ) -> GetUserTeamHandler:
     return GetUserTeamHandler(team_repo)
 
+
 def get_active_users_handler(
-    team_repo: TeamRepository = Depends(get_team_repository)
+    team_repo: TeamRepository = Depends(get_team_repository),
 ) -> GetActiveUsersHandler:
     return GetActiveUsersHandler(team_repo)
 
@@ -215,6 +237,7 @@ def RequireRoles(
     """
     Dependency factory for role-based and granular authorization.
     """
+
     async def _authorize(
         db: Session = Depends(get_db),
         _=Depends(set_authorized_user),
@@ -252,6 +275,7 @@ def RequireRoles(
 
     return _authorize
 
+
 def get_create_team_handler(db: Session = Depends(get_db)) -> CreateTeamHandler:
     return CreateTeamHandler(get_team_repository(db))
 
@@ -261,7 +285,7 @@ def get_list_teams_handler(db: Session = Depends(get_db)) -> ListTeamsHandler:
 
 
 def get_team_detail_handler(db: Session = Depends(get_db)) -> GetTeamDetailHandler:
-    return GetTeamDetailHandler(get_team_repository(db))
+    return GetTeamDetailHandler(get_team_repository(db), get_role_repository(db))
 
 
 def get_send_team_invitations_handler(

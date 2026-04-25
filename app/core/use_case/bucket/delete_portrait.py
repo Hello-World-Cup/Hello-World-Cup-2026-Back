@@ -7,17 +7,11 @@ class DeletePortraitHandler(HandlerInterface):
     def __init__(self, storage: StorageBucketInterfaceABC):
         self._storage = storage
     
-    def execute(self, dto: DeletePortraitDTO) -> dict:
+    async def execute(self, dto: DeletePortraitDTO) -> dict:
         path = f"portrait/user_{dto.user_id}.png"
         
-        if not self._storage.file_exists("images", path):
-            raise FileNotFoundError(
-                bucket="images",
-                path=path,
-                message="Profile picture not found for this user"  # ← Inglés
-            )
-        
-        self._storage.delete_file("images", path)
+        await self._storage.delete_file("images", path)
+
         return {
             "path": path,
             "message": "Profile picture deleted successfully"  # ← Inglés

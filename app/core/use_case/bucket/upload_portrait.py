@@ -13,7 +13,7 @@ class UploadPortraitHandler(HandlerInterface):
     def __init__(self, storage: StorageBucketInterfaceABC):
         self._storage = storage
     
-    def execute(self, dto: UploadPortraitDTO) -> dict:
+    async def execute(self, dto: UploadPortraitDTO) -> dict:
         if dto.content_type != "image/png":
             raise InvalidFileTypeError(
                 expected="image/png",
@@ -31,7 +31,7 @@ class UploadPortraitHandler(HandlerInterface):
             )
         
         path = f"portrait/user_{dto.user_id}.png"
-        url = self._storage.upload_file(
+        url = await self._storage.upload_file(
             bucket="images",
             path=path,
             file_data=BytesIO(file_bytes),

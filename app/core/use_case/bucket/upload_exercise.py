@@ -15,7 +15,7 @@ class UploadExerciseHandler(HandlerInterface):
     def __init__(self, storage: StorageBucketInterfaceABC):
         self._storage = storage
     
-    def execute(self, dto: UploadExerciseDTO) -> dict:
+    async def execute(self, dto: UploadExerciseDTO) -> dict:
         if dto.content_type != "application/pdf":
             raise InvalidFileTypeError(
                 expected="application/pdf",
@@ -35,7 +35,7 @@ class UploadExerciseHandler(HandlerInterface):
         path = f"exercise_{dto.exercise_id}.pdf"
         
         try:
-            url = self._storage.upload_file(
+            url = await self._storage.upload_file(
                 bucket="exercises",
                 path=path,
                 file_data=BytesIO(file_bytes),
