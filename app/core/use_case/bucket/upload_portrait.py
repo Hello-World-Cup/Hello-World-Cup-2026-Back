@@ -26,7 +26,7 @@ class UploadPortraitHandler(HandlerInterface):
         if not user or not user.id:
             raise DomainException("Authentication required", USER_UNAUTHORIZED)
 
-        if not user.id == dto.user_id:
+        if not user.id == int(dto.user_id):
             raise DomainException(
                 "Unauthorized to upload portrait for this user", USER_UNAUTHORIZED
             )
