@@ -75,6 +75,7 @@ async def upload_sponsor_logo(
     file: UploadFile = File(..., description="Sponsor logo (PNG)"),
     sponsor_id: str = Form(..., description="Sponsor ID"),
     handler: UploadSponsorLogoHandler = Depends(get_upload_sponsor_logo_handler),
+    _=Depends(RequireRoles(["admin"], [])),
 ) -> Any:
     content = await file.read()
     return await handler.execute(
@@ -100,6 +101,7 @@ async def get_sponsor_logo(
 async def get_exercise(
     exercise_id: str = Path(..., description="Exercise ID"),
     handler: GetExerciseHandler = Depends(get_get_exercise_handler),
+    _=Depends(RequireRoles(["common_user", "admin"], [])),
 ) -> Any:
     return await handler.execute(GetExerciseDTO(exercise_id=exercise_id))
 
@@ -110,6 +112,7 @@ async def upload_exercise(
     file: UploadFile = File(..., description="Exercise PDF"),
     exercise_id: str = Form(..., description="Exercise ID"),
     handler: UploadExerciseHandler = Depends(get_upload_exercise_handler),
+    _=Depends(RequireRoles(["admin"], [])),
 ) -> Any:
     content = await file.read()
     return await handler.execute(
