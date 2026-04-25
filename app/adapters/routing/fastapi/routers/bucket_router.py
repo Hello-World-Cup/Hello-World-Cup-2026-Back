@@ -17,6 +17,7 @@ from app.core.use_case.bucket.get_portrait import GetPortraitHandler
 from app.core.use_case.bucket.get_sponsor_logo import GetSponsorLogoHandler
 from app.core.use_case.bucket.get_exercise import GetExerciseHandler
 from app.adapters.database.dependencies import (
+    RequireRoles,
     get_upload_portrait_handler,
     get_delete_portrait_handler,
     get_upload_sponsor_logo_handler,
@@ -37,6 +38,7 @@ async def upload_portrait(
     file: UploadFile = File(..., description="Profile picture (PNG)"),
     user_id: str = Form(..., description="User ID"),
     handler: UploadPortraitHandler = Depends(get_upload_portrait_handler),
+    _=Depends(RequireRoles(["common_user", "admin"], [])),
 ) -> Any:
     content = await file.read()
     return await handler.execute(
