@@ -102,6 +102,7 @@ app/
 
 ```bash
 cp .env.development.example .env
+chmod +x entrypoint.sh
 docker compose up --build
 ```
 
