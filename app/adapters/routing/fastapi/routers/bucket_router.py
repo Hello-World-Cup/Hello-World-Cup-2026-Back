@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, File, UploadFile, Form, Path # type: ignore
+from fastapi import APIRouter, Depends, File, UploadFile, Form, Path  # type: ignore
 from io import BytesIO
 from app.domain.dtos.bucket_dto import (
     UploadPortraitDTO,
@@ -26,7 +26,7 @@ from app.adapters.database.dependencies import (
     get_get_exercise_handler,
 )
 from app.adapters.routing.utils.decorators import format_response
-from typing import Any  
+from typing import Any
 
 bucket_router = APIRouter(prefix="/bucket", tags=["Files"])
 
@@ -37,7 +37,7 @@ async def upload_portrait(
     file: UploadFile = File(..., description="Profile picture (PNG)"),
     user_id: str = Form(..., description="User ID"),
     handler: UploadPortraitHandler = Depends(get_upload_portrait_handler),
-) -> Any: 
+) -> Any:
     content = await file.read()
     return await handler.execute(
         UploadPortraitDTO(
@@ -53,7 +53,7 @@ async def upload_portrait(
 async def delete_portrait(
     user_id: str = Path(..., description="User ID"),
     handler: DeletePortraitHandler = Depends(get_delete_portrait_handler),
-) -> Any: 
+) -> Any:
     return await handler.execute(DeletePortraitDTO(user_id=user_id))
 
 
@@ -62,7 +62,7 @@ async def delete_portrait(
 async def get_portrait(
     user_id: str = Path(..., description="User ID"),
     handler: GetPortraitHandler = Depends(get_get_portrait_handler),
-) -> Any: 
+) -> Any:
     return await handler.execute(GetPortraitDTO(user_id=user_id))
 
 
@@ -72,7 +72,7 @@ async def upload_sponsor_logo(
     file: UploadFile = File(..., description="Sponsor logo (PNG)"),
     sponsor_id: str = Form(..., description="Sponsor ID"),
     handler: UploadSponsorLogoHandler = Depends(get_upload_sponsor_logo_handler),
-) -> Any: 
+) -> Any:
     content = await file.read()
     return await handler.execute(
         UploadSponsorLogoDTO(
@@ -88,7 +88,7 @@ async def upload_sponsor_logo(
 async def get_sponsor_logo(
     sponsor_id: str = Path(..., description="Sponsor ID"),
     handler: GetSponsorLogoHandler = Depends(get_get_sponsor_logo_handler),
-) -> Any: 
+) -> Any:
     return await handler.execute(GetSponsorLogoDTO(sponsor_id=sponsor_id))
 
 
@@ -107,7 +107,7 @@ async def upload_exercise(
     file: UploadFile = File(..., description="Exercise PDF"),
     exercise_id: str = Form(..., description="Exercise ID"),
     handler: UploadExerciseHandler = Depends(get_upload_exercise_handler),
-) -> Any:  
+) -> Any:
     content = await file.read()
     return await handler.execute(
         UploadExerciseDTO(

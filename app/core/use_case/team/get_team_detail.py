@@ -10,7 +10,11 @@ from app.adapters.routing.utils.context import user_context
 
 
 class GetTeamDetailHandler(HandlerInterface):
-    def __init__(self, team_repository: TeamRepositoryInterface, role_repository: RoleRepositoryInterface) -> None:
+    def __init__(
+        self,
+        team_repository: TeamRepositoryInterface,
+        role_repository: RoleRepositoryInterface,
+    ) -> None:
         self._team_repository = team_repository
         self._role_repository = role_repository
 
