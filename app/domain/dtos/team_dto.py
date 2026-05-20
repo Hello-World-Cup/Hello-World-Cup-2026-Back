@@ -227,6 +227,7 @@ class DeleteTeamResponseDTO(BaseModel):
 
 
 class UserListDTO(BaseModel):
+    id: int
     username: str
     name: str
     programming_language: ProgrammingLanguage | None = None

@@ -329,6 +329,7 @@ class TeamRepository(TeamRepositoryInterface, TeamQueryInterface):
         
         return [
             UserListDTO(
+                id=user.id,
                 username=user.username,
                 name=user.name,
                 programming_language=user.programming_language,
@@ -348,6 +349,7 @@ class TeamRepository(TeamRepositoryInterface, TeamQueryInterface):
 
         return [
             UserListDTO(
+                id=user.id,
                 username=user.username,
                 name=user.name,
                 programming_language=user.programming_language,

@@ -81,7 +81,7 @@ def list_teams_table(
     return use_case.execute()
 
 
-@router.get("/me", response_model=ResultSchema[ListTeamsDisplayResponseDTO])
+@router.get("/me", response_model=ResultSchema[GetTeamDetailResponseDTO])
 @format_response
 async def get_user_team(
     handler: GetUserTeamHandler = Depends(get_user_team_handler),
@@ -185,4 +185,3 @@ def delete_team(
     use_case: HandlerInterface = Depends(get_delete_team_handler),
 ) -> Any:
     return use_case.execute(_get_current_user_id(), team_id)
-
