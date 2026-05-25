@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     POSTGRES_URI: str
     SUPABASE_URL: str
     SUPABASE_SERVICE_ROLE_KEY: str
+    GOOGLE_SCRIPT_URL: str
 
     ENVIRONMENT: Environment
     CLEAR_EXISTING_DATA_FOR_DEVELOPMENT: bool
