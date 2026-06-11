@@ -33,5 +33,7 @@ class Settings(BaseSettings):
     SMTP_FROM_EMAIL: str | None = None
     SMTP_FROM_NAME: str = "HWC"
 
+    FRONTEND_BASE_URL: str = ""
+
 
 settings = Settings()

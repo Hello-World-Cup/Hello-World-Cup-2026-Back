@@ -60,7 +60,7 @@ class RegisterUserHandler(HandlerInterface):
             )
         )
 
-        verify_link = f"{settings.API_BASE_URL}/auth/verify?token={token}"
+        verify_link = f"{settings.FRONTEND_BASE_URL}/verify?token={token}"
 
         if not user.email or not user.name:
             raise InvalidCredentialsException()
